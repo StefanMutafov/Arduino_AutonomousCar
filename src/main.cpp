@@ -1,6 +1,7 @@
 #include <Arduino.h>
-#include "../test/test_functions.h"
 #include <QTRSensors.h>
+#include "test_functions.h"
+#include "functions.h"
 QTRSensors qtr;
 Servo myServo;
 void setup() {
@@ -8,15 +9,13 @@ void setup() {
     for(unsigned char sensorPin : sensorPins){
         pinMode(sensorPin, INPUT);
     }
-    pinMode(LPWM_Output, OUTPUT);
-    pinMode(RPWM_Output, OUTPUT);
+    myServo.write(57);
     myServo.attach(SERVO_PIN);
-    pinMode(UlTRASONIC_TRIG_PIN, OUTPUT);
-    pinMode(ULTRASONIC_ECHO_PIN, INPUT);
+//    pinMode(LPWM_Output, OUTPUT);
+//    pinMode(RPWM_Output, OUTPUT);
+//    pinMode(UlTRASONIC_TRIG_PIN, OUTPUT);
+//    pinMode(ULTRASONIC_ECHO_PIN, INPUT);
     setup_array(qtr);
-
-
-
 }
 
 
@@ -24,5 +23,10 @@ void setup() {
 
 void loop() {
 // write your code here
+    int position = getPosition(qtr);
+    int correction = getTurnDeg(position);
 
+    test_servo(myServo, correction);
+   // delay(100);
+   // test_array(qtr);
 }

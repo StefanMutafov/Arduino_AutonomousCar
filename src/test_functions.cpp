@@ -5,18 +5,18 @@
 #include "test_functions.h"
 
 void test_servo(Servo& myServo,const int degrees){
-    if(abs(degrees) <= SERVO_DEG_MAX){
+    if(degrees <= SERVO_DEG_MAX && degrees >= SERVO_DEG_MIN){
         myServo.write(degrees);
         delay(10);
-    }else if(degrees > 0){
+    }else if(degrees > SERVO_DEG_MAX){
         myServo.write(SERVO_DEG_MAX);
         delay(10);
     }else{
-        myServo.write(-SERVO_DEG_MAX);
+        myServo.write(SERVO_DEG_MIN);
         delay(10);
     }
-    Serial.print("Current Servo degrees: ");
-    Serial.println(myServo.read());
+    //Serial.print("Current Servo degrees: ");
+    //Serial.println(myServo.read());
 }
 
 void test_ultraSonic(){
@@ -71,7 +71,7 @@ void test_array(QTRSensors& qtr){
     uint16_t position = qtr.readLineWhite(array);
     for (uint8_t i = 0; i < SENSOR_COUNT; i++)
     {
-        Serial.print("Sensor");
+        Serial.print("Sensor ");
         Serial.print(i);
         Serial.print(":");
         Serial.print(array[i]);
@@ -96,8 +96,8 @@ void test_motor(int level){
     {
         // forward rotation
         int forwardPWM = (level - 512) / 2;
-        analogWrite(LPWM_Output, forwardPWM);
         analogWrite(RPWM_Output, 0);
+        analogWrite(LPWM_Output, forwardPWM);
     }
 
 }

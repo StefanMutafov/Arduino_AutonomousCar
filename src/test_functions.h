@@ -5,8 +5,8 @@
 #ifndef AUTONOMOUSCAR_TEST_FUNCTIONS_H
 #define AUTONOMOUSCAR_TEST_FUNCTIONS_H
 #include <Arduino.h>
-#include <Servo.h>
-#include <QTRSensors.h>
+#include "Servo.h"
+#include "QTRSensors.h"
 #include "config.h"
 ///Tests the servo by rotating it to certain degrees
 ///Could be used with potentiometer
