@@ -7,13 +7,13 @@
 void test_servo(Servo& myServo,const int degrees){
     if(degrees <= SERVO_DEG_MAX && degrees >= SERVO_DEG_MIN){
         myServo.write(degrees);
-        delay(10);
+       // delay(10);
     }else if(degrees > SERVO_DEG_MAX){
         myServo.write(SERVO_DEG_MAX);
-        delay(10);
+       // delay(10);
     }else{
         myServo.write(SERVO_DEG_MIN);
-        delay(10);
+     //   delay(10);
     }
     //Serial.print("Current Servo degrees: ");
     //Serial.println(myServo.read());
