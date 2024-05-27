@@ -21,7 +21,7 @@ void test_ultraSonic();
 
 ///@param qtr Reference to the array object
 void test_array(QTRSensors& qtr);
-void setup_array(QTRSensors& qtr);
+//void setup_array(QTRSensors& qtr);
 
 ///Tests the motor and motor shield by setting the motor speed
 ///Could be used with potentiometer

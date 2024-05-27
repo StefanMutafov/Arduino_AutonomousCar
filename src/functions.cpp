@@ -3,6 +3,33 @@
 //
 
 #include "functions.h"
+void setup_array(QTRSensors& qtr){
+    qtr.setTypeRC();
+    qtr.setSensorPins(sensorPins, SENSOR_COUNT);
+
+    // 2.5 ms RC read timeout (default) * 10 reads per calibrate() call
+    // = ~25 ms per calibrate() call.
+    // Call calibrate() 400 times to make calibration take about 10 seconds.
+    for (uint16_t i = 0; i < 400; i++)
+    {
+        qtr.calibrate();
+    }
+    Serial.begin(9600);
+    for (uint8_t i = 0; i < SENSOR_COUNT; i++)
+    {
+        Serial.print(qtr.calibrationOn.minimum[i]);
+        Serial.print(' ');
+    }
+    Serial.println();
+    for (uint8_t i = 0; i < SENSOR_COUNT; i++)
+    {
+        Serial.print(qtr.calibrationOn.maximum[i]);
+        Serial.print(' ');
+    }
+    Serial.println();
+
+}
+
 void setupArray_manual(QTRSensors& qtr){
     qtr.setTypeRC();
     qtr.setSensorPins(sensorPins, SENSOR_COUNT);
@@ -60,8 +87,9 @@ void drive(Servo& myServo,int speed, int turnAngle){
     }
 }
 
-int getTurnDeg(const int position) {
-    const double Kp = 0.4;
+double getTurnDeg(const int position) {
+    const double Kp = 0.00399;
+   // const double Kp = 0.4;
     const double Ki = 0.00;
     const double Kd = 0.0;
     const int midPosition = 3500;
@@ -76,12 +104,12 @@ int getTurnDeg(const int position) {
     integral += error;
     derivative = error - previous_error;
     correction = Kp * error + Ki * integral + Kd * derivative;
-    double divisions = Kp*midPosition*2 + Ki*integral + Kd*(midPosition*2-previous_error);
+   // double divisions = Kp*midPosition*2 + Ki*integral + Kd*(midPosition*2-previous_error);
     //correction = map(correction, 0, Kp*midPosition* 2, 35, 90);
-    correction = ((SERVO_DEG_MAX-SERVO_DEG_MIN)/divisions)*correction;
+  //  correction = ((SERVO_DEG_MAX-SERVO_DEG_MIN)/divisions)*correction;
     previous_error = error;
-    Serial.print("Correction: ");
-    Serial.println(correction);
+   // Serial.print("Correction: ");
+    //Serial.println(correction);
     return correction;
 }
 
@@ -104,31 +132,56 @@ int getPosition(QTRSensors& qtr, bool& atFinish){
     return position;
 }
 
-bool obstacleDetected(int US_trig, int US_echo){
-    //Could be done with NewPing library, but will probably get faulty 0 values
-    unsigned long duration;
-    unsigned int distance;
-    digitalWrite(US_trig, LOW);
+void getUSValues(double& distance1, double& distance2){
+    unsigned long duration1;
+    unsigned long duration2;
+    digitalWrite(UlTRASONIC1_TRIG_PIN, LOW);
+    digitalWrite(UlTRASONIC2_TRIG_PIN, LOW);
     delayMicroseconds(2);
-    digitalWrite(US_trig, HIGH);
+    digitalWrite(UlTRASONIC1_TRIG_PIN, HIGH);
+    digitalWrite(UlTRASONIC2_TRIG_PIN, HIGH);
     delayMicroseconds(10);
-    digitalWrite(US_trig, LOW);
-    duration = pulseIn(US_echo, HIGH);
-    //distance is measured from the board
-    distance = duration * 0.034 / 2;
+    digitalWrite(UlTRASONIC1_TRIG_PIN, LOW);
+    digitalWrite(UlTRASONIC2_TRIG_PIN, LOW);
+    duration1 = pulseIn(ULTRASONIC1_ECHO_PIN, HIGH);
+    duration2 = pulseIn(ULTRASONIC2_ECHO_PIN, HIGH);
+    distance1 = duration1 * 0.034 / 2;
+    distance2 = duration2 * 0.034 / 2;
+}
 
-    if (distance <= MAX_DETECT_DISTANCE)
+bool obstacleDetected(double distance1, double distance2){
+    if(distance2 <= MAX_DETECT_DISTANCE && distance1-distance2 < US_DETECTION_DIFFERENCE)
     {
-        // Serial.print("TRUE Distance of US 1 in cm: ");
-        // Serial.println(distance);
         return true;
     }
-
-    // Serial.print("FALSE");
     return false;
-    //Serial.print("Distance of US 1 in cm: ");
-    //Serial.println(distance);
 }
+
+//bool obstacleDetected(int US_trig, int US_echo){
+//    //Could be done with NewPing library, but will probably get faulty 0 values
+//    unsigned long duration;
+//    unsigned int distance;
+//    digitalWrite(US_trig, LOW);
+//    delayMicroseconds(2);
+//    digitalWrite(US_trig, HIGH);
+//    delayMicroseconds(10);
+//    digitalWrite(US_trig, LOW);
+//    duration = pulseIn(US_echo, HIGH);
+//    //distance is measured from the board
+//    distance = duration * 0.034 / 2;
+//
+//    if (distance <= MAX_DETECT_DISTANCE)
+//    {
+//        // Serial.print("TRUE Distance of US 1 in cm: ");
+//        // Serial.println(distance);
+//        return true;
+//    }
+//
+//    // Serial.print("FALSE");
+//    return false;
+//    //Serial.print("Distance of US 1 in cm: ");
+//    //Serial.println(distance);
+//}
 void avoidObstacle(Servo& myServo, int& speed){
 
     drive(myServo, speed, SERVO_DEG_MAX);
@@ -136,6 +189,14 @@ void avoidObstacle(Servo& myServo, int& speed){
 //    drive(myServo, speed, SERVO_DEG_MAX);
 //    delay(3000);
 }
+
+//bool detectHill(double distance1, double distance2){
+//    if(distance2 <= MAX_DETECT_DISTANCE && distance2-distance1 > US_DETECTION_DIFFERENCE)
+//    {
+//        return true;
+//    }
+//    return false;
+//}
 
 int detectHill(Adafruit_MPU6050& mpu){
     sensors_event_t a, g, temp;
@@ -151,6 +212,27 @@ int detectHill(Adafruit_MPU6050& mpu){
     delay(500);
 
     return 0;
+}
+double getCurrentSpeed(double currentDistance){
+    static unsigned long current_time = 0;
+    static double lastDistance = 0;
+    if (currentDistance <= 80 && currentDistance > 60)
+    {
+        lastDistance = currentDistance;
+        current_time = millis();
+        return 0;
+    }
+    if (currentDistance <= 60 && currentDistance > 0)
+    {
+        lastDistance = lastDistance - currentDistance;
+        current_time = millis() - current_time;
+    }
+
+    if (current_time > 0) return (lastDistance/100)/(current_time/1000);
+
+    return 0;
+
+
 }
 
 void stopCar(Servo& myServo){

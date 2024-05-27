@@ -14,8 +14,8 @@ void setup() {
     myServo.attach(SERVO_PIN);
     pinMode(LPWM_Output, OUTPUT);
     pinMode(RPWM_Output, OUTPUT);
-    pinMode(UlTRASONIC_TRIG_PIN, OUTPUT);
-    pinMode(ULTRASONIC_ECHO_PIN, INPUT);
+    pinMode(UlTRASONIC1_TRIG_PIN, OUTPUT);
+    pinMode(ULTRASONIC1_ECHO_PIN, INPUT);
 
 //setupArray_manual(qtr);
     setup_array(qtr);
@@ -28,20 +28,22 @@ void setup() {
 void loop() {
 // write your code here
 static bool finishDetected = false;
+    static int speed = DEFAULT_SPEED;
     int position = getPosition(qtr, finishDetected);
+    double US1 = 0, US2 = 0;
+    getUSValues(US1, US2);
     if(finishDetected){
         stopCar(myServo);
         delay(200000);
         //TODO:Make some kind of a restart mechanism, like a button or smth;
     }
-    int correction = getTurnDeg(position);
-    int speed = DEFAULT_SPEED;
+    double correction = getTurnDeg(position);
 //    if(detectHill(mpu) == 1){
 //        speed = DEFAULT_SPEED * HILL_ACCELERATION;
 //    }else{
 //        speed = DEFAULT_SPEED;
 //    }
-    if(obstacleDetected(UlTRASONIC_TRIG_PIN, ULTRASONIC_ECHO_PIN)){
+    if(obstacleDetected(US1, US2)){
         avoidObstacle(myServo, speed);
     }
     drive(myServo, DEFAULT_SPEED, correction);

@@ -21,51 +21,60 @@ void test_servo(Servo& myServo,const int degrees){
 
 void test_ultraSonic(){
     //Could be done with NewPing library, but will probably get faulty 0 values
-    unsigned long duration;
-    unsigned int distance;
-    digitalWrite(UlTRASONIC_TRIG_PIN, LOW);
+    unsigned long duration1;
+    unsigned int distance1;
+    unsigned long duration2;
+    unsigned int distance2;
+    digitalWrite(UlTRASONIC1_TRIG_PIN, LOW);
+    digitalWrite(UlTRASONIC2_TRIG_PIN, LOW);
     delayMicroseconds(2);
-    digitalWrite(UlTRASONIC_TRIG_PIN, HIGH);
+    digitalWrite(UlTRASONIC1_TRIG_PIN, HIGH);
+    digitalWrite(UlTRASONIC2_TRIG_PIN, HIGH);
     delayMicroseconds(10);
-    digitalWrite(UlTRASONIC_TRIG_PIN, LOW);
-    duration = pulseIn(ULTRASONIC_ECHO_PIN, HIGH);
-    distance = duration * 0.034 / 2;
-    Serial.print("Distance in cm: ");
-    Serial.println(distance);
+    digitalWrite(UlTRASONIC1_TRIG_PIN, LOW);
+    digitalWrite(UlTRASONIC2_TRIG_PIN, LOW);
+    duration1 = pulseIn(ULTRASONIC1_ECHO_PIN, HIGH);
+    distance1 = duration1 * 0.034 / 2;
+    duration2 = pulseIn(ULTRASONIC2_ECHO_PIN, HIGH);
+    distance2 = duration2 * 0.034 / 2;
+    Serial.print("Distance 1 in cm: ");
+    Serial.println(distance1);
+    Serial.print("Distance 2 in cm: ");
+    Serial.println(distance2);
 }
-void setup_array(QTRSensors& qtr){
-    qtr.setTypeRC();
-    qtr.setSensorPins(sensorPins, SENSOR_COUNT);
-    /*I think the calibration has to be done only once when using the array for the first time, but am not sure*/
-    // For the calibration all the IR sensors need to be moved across the line, so that they can get their max an min values
-
-
-    // 2.5 ms RC read timeout (default) * 10 reads per calibrate() call
-    // = ~25 ms per calibrate() call.
-    // Call calibrate() 400 times to make calibration take about 10 seconds.
-    for (uint16_t i = 0; i < 400; i++)
-    {
-        qtr.calibrate();
-    }
-
-    // print the calibration minimum values measured when emitters were on
-    Serial.begin(9600);
-    for (uint8_t i = 0; i < SENSOR_COUNT; i++)
-    {
-        Serial.print(qtr.calibrationOn.minimum[i]);
-        Serial.print(' ');
-    }
-    Serial.println();
-
-    // print the calibration maximum values measured when emitters were on
-    for (uint8_t i = 0; i < SENSOR_COUNT; i++)
-    {
-        Serial.print(qtr.calibrationOn.maximum[i]);
-        Serial.print(' ');
-    }
-    Serial.println();
-
-}
+//void setup_array(QTRSensors& qtr){
+//    qtr.setTypeRC();
+//    qtr.setSensorPins(sensorPins, SENSOR_COUNT);
+//    /*I think the calibration has to be done only once when using the array for the first time, but am not sure*/
+//    // For the calibration all the IR sensors need to be moved across the line, so that they can get their max an min values
+//
+//
+//    // 2.5 ms RC read timeout (default) * 10 reads per calibrate() call
+//    // = ~25 ms per calibrate() call.
+//    // Call calibrate() 400 times to make calibration take about 10 seconds.
+//    for (uint16_t i = 0; i < 400; i++)
+//    {
+//        qtr.calibrate();
+//    }
+//
+//    // print the calibration minimum values measured when emitters were on
+//    Serial.begin(9600);
+//    for (uint8_t i = 0; i < SENSOR_COUNT; i++)
+//    {
+//        Serial.print(qtr.calibrationOn.minimum[i]);
+//        Serial.print(' ');
+//    }
+//    Serial.println();
+//
+//    // print the calibration maximum values measured when emitters were on
+//    for (uint8_t i = 0; i < SENSOR_COUNT; i++)
+//    {
+//        Serial.print(qtr.calibrationOn.maximum[i]);
+//        Serial.print(' ');
+//    }
+//    Serial.println();
+//
+//}
 void test_array(QTRSensors& qtr){
     uint16_t array[SENSOR_COUNT];
     uint16_t position = qtr.readLineWhite(array);
@@ -80,6 +89,8 @@ void test_array(QTRSensors& qtr){
     Serial.print("Position: ");
     Serial.println(position);
 }
+
+
 
 void test_motor(int level){
 // sensor value is in the range 0 to 1023
