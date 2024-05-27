@@ -6,7 +6,7 @@ QTRSensors qtr;
 Servo myServo;
 Adafruit_MPU6050 mpu;
 void setup() {
-    //Serial.begin(9600);
+    Serial.begin(9600);
     for(unsigned char sensorPin : sensorPins){
         pinMode(sensorPin, INPUT);
     }

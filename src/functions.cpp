@@ -14,7 +14,6 @@ void setup_array(QTRSensors& qtr){
     {
         qtr.calibrate();
     }
-    Serial.begin(9600);
     for (uint8_t i = 0; i < SENSOR_COUNT; i++)
     {
         Serial.print(qtr.calibrationOn.minimum[i]);

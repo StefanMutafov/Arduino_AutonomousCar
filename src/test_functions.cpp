@@ -58,7 +58,7 @@ void test_ultraSonic(){
 //    }
 //
 //    // print the calibration minimum values measured when emitters were on
-//    Serial.begin(9600);
+//
 //    for (uint8_t i = 0; i < SENSOR_COUNT; i++)
 //    {
 //        Serial.print(qtr.calibrationOn.minimum[i]);
