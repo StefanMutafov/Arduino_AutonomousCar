@@ -21,26 +21,17 @@ void test_servo(Servo& myServo,const int degrees){
 
 void test_ultraSonic(){
     //Could be done with NewPing library, but will probably get faulty 0 values
-    unsigned long duration1;
-    unsigned int distance1;
-    unsigned long duration2;
-    unsigned int distance2;
-    digitalWrite(UlTRASONIC1_TRIG_PIN, LOW);
-    digitalWrite(UlTRASONIC2_TRIG_PIN, LOW);
+    unsigned long duration;
+    unsigned int distance;
+    digitalWrite(UlTRASONIC_TRIG_PIN, LOW);
     delayMicroseconds(2);
-    digitalWrite(UlTRASONIC1_TRIG_PIN, HIGH);
-    digitalWrite(UlTRASONIC2_TRIG_PIN, HIGH);
+    digitalWrite(UlTRASONIC_TRIG_PIN, HIGH);
     delayMicroseconds(10);
-    digitalWrite(UlTRASONIC1_TRIG_PIN, LOW);
-    digitalWrite(UlTRASONIC2_TRIG_PIN, LOW);
-    duration1 = pulseIn(ULTRASONIC1_ECHO_PIN, HIGH);
-    distance1 = duration1 * 0.034 / 2;
-    duration2 = pulseIn(ULTRASONIC2_ECHO_PIN, HIGH);
-    distance2 = duration2 * 0.034 / 2;
+    digitalWrite(UlTRASONIC_TRIG_PIN, LOW);
+    duration = pulseIn(ULTRASONIC_ECHO_PIN, HIGH);
+    distance = duration * 0.034 / 2;
     Serial.print("Distance 1 in cm: ");
-    Serial.println(distance1);
-    Serial.print("Distance 2 in cm: ");
-    Serial.println(distance2);
+    Serial.println(distance);
 }
 //void setup_array(QTRSensors& qtr){
 //    qtr.setTypeRC();

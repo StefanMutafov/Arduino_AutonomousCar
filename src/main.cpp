@@ -2,56 +2,62 @@
 #include <QTRSensors.h>
 #include "test_functions.h"
 #include "functions.h"
+
 QTRSensors qtr;
 Servo myServo;
 Adafruit_MPU6050 mpu;
+
 void setup() {
     Serial.begin(9600);
-    for(unsigned char sensorPin : sensorPins){
+    // setupMPU(mpu);
+    for (unsigned char sensorPin: sensorPins) {
         pinMode(sensorPin, INPUT);
     }
     myServo.write(SERVO_MID);
     myServo.attach(SERVO_PIN);
     pinMode(LPWM_Output, OUTPUT);
     pinMode(RPWM_Output, OUTPUT);
-    pinMode(UlTRASONIC1_TRIG_PIN, OUTPUT);
-    pinMode(ULTRASONIC1_ECHO_PIN, INPUT);
+    pinMode(UlTRASONIC_TRIG_PIN, OUTPUT);
+    pinMode(ULTRASONIC_ECHO_PIN, INPUT);
 
 //setupArray_manual(qtr);
     setup_array(qtr);
-    //setupMPU(mpu);
+    setupMPU(mpu);
 }
-
-
 
 
 void loop() {
 // write your code here
-static bool finishDetected = false;
+    static bool finishDetected = false;
     static int speed = DEFAULT_SPEED;
     int position = getPosition(qtr, finishDetected);
-    double US1 = 0, US2 = 0;
-    getUSValues(US1, US2);
-    if(finishDetected){
+   // int incline = detectHill(mpu);
+  //  double distance = getUSValues();
+    //double currentSpeed = getCurrentSpeed(distance);
+
+    if (finishDetected) {
         stopCar(myServo);
         delay(200000);
         //TODO:Make some kind of a restart mechanism, like a button or smth;
     }
     double correction = getTurnDeg(position);
-//    if(detectHill(mpu) == 1){
+//    if (obstacleDetected(distance)) {
+//        avoidObstacle(myServo, currentSpeed, distance);
+//    }
+//    if(incline == 1) {
 //        speed = DEFAULT_SPEED * HILL_ACCELERATION;
-//    }else{
+//        while(incline != -1){
+//            incline = detectHill(mpu);
+//            drive(myServo, speed, 0);
+//        }
+//        position = getPosition(qtr, finishDetected);
+//        speed = DEFAULT_SPEED-15;
+//        drive(myServo, speed, 0);
+//        delay(950);
+//        position = getPosition(qtr, finishDetected);
 //        speed = DEFAULT_SPEED;
 //    }
-    if(obstacleDetected(US1, US2)){
-        avoidObstacle(myServo, speed);
-    }
-    drive(myServo, DEFAULT_SPEED, correction);
 
-//    test_servo(myServo, correction);
-//    analogWrite(LPWM_Output, 35.2);
-//    analogWrite(RPWM_Output, 0);
+    drive(myServo, speed, correction);
 
-   // delay(100);
-   // test_array(qtr);
 }

@@ -11,6 +11,9 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
+
+void avoidHill(Servo& myServo);
+//bool detectHill(double distance1, double distance2);
 ///Setup function for gyroscope
 ///@param mpu Reference to the gyroscope
 void setupMPU(Adafruit_MPU6050& mpu);
@@ -35,10 +38,9 @@ double getTurnDeg(const int position);
 ///@param turnAngle The correction to the turn angle
 void drive(Servo& myServo, int speed, int turnAngle);
 
-///Get the values from the US_Sensors
-///@param distance1 A reference to the variable recording the distance of the first sensor
-///@param distance1 A reference to the variable recording the distance of the second sensor
-void getUSValues(double& distance1, double& distance2);
+///Get the values from the US_Sensor
+///@return the reading from the sensor
+double getUSValues();
 
 ///Get the position from the  IR_Sensor Array
 ///@param qtr Reference to the IR_Sensor Array
@@ -48,10 +50,9 @@ int getPosition(QTRSensors& qtr, bool& detectFinish);
 
 
 ///Detecting an obstacle
-///@param distance1 The distance from the first US
-///@param distance1 The distance from the second US
+///@param distance1 The distance from the US
 ///@return TRUE if detected FALSE otherwise
-bool obstacleDetected(double distance1, double distance2);
+bool obstacleDetected(double distance);
 
 ///Calculate current speed based on US position
 ///@param distance Distance from one of the US
@@ -61,7 +62,7 @@ double getCurrentSpeed(double distance);
 ///Avoid an obstacle
 ///@param myServo  The servo responsible for turning
 ///@param Reference to the current speed
-void avoidObstacle(Servo& myServo, int& speed);
+void avoidObstacle(Servo& myServo, double currentSpeed, double distance);
 
 ///Detect a hill
 ///@param mpu Reference to the gyroscope
