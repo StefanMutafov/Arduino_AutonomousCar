@@ -9,7 +9,6 @@ Adafruit_MPU6050 mpu;
 
 void setup() {
     Serial.begin(9600);
-    // setupMPU(mpu);
     for (unsigned char sensorPin: sensorPins) {
         pinMode(sensorPin, INPUT);
     }
@@ -20,7 +19,7 @@ void setup() {
     pinMode(UlTRASONIC_TRIG_PIN, OUTPUT);
     pinMode(ULTRASONIC_ECHO_PIN, INPUT);
 
-//setupArray_manual(qtr);
+    //setupArray_manual(qtr);
     setup_array(qtr);
     setupMPU(mpu);
 }
@@ -31,32 +30,28 @@ void loop() {
     static bool finishDetected = false;
     static int speed = DEFAULT_SPEED;
     int position = getPosition(qtr, finishDetected);
-   // int incline = detectHill(mpu);
-  //  double distance = getUSValues();
-    //double currentSpeed = getCurrentSpeed(distance);
+    int incline = detectHill(mpu);
+    double distance = getUSValues();
+    double currentSpeed = 1.1;
+
+
 
     if (finishDetected) {
         stopCar(myServo);
-        delay(200000);
+        while (true) {
+            delay(200000);
+        }
         //TODO:Make some kind of a restart mechanism, like a button or smth;
     }
     double correction = getTurnDeg(position);
-//    if (obstacleDetected(distance)) {
-//        avoidObstacle(myServo, currentSpeed, distance);
-//    }
-//    if(incline == 1) {
-//        speed = DEFAULT_SPEED * HILL_ACCELERATION;
-//        while(incline != -1){
-//            incline = detectHill(mpu);
-//            drive(myServo, speed, 0);
-//        }
-//        position = getPosition(qtr, finishDetected);
-//        speed = DEFAULT_SPEED-15;
-//        drive(myServo, speed, 0);
-//        delay(950);
-//        position = getPosition(qtr, finishDetected);
-//        speed = DEFAULT_SPEED;
-//    }
+    if (obstacleDetected(distance)) {
+        avoidObstacle(myServo, currentSpeed);
+        position = getPosition(qtr, finishDetected);
+        correction = getTurnDeg(position);
+    }
+    if(incline == 1) {
+        avoidHill(qtr, myServo);
+    }
 
     drive(myServo, speed, correction);
 

@@ -18,7 +18,6 @@ void test_servo(Servo& myServo,int degrees);
 void test_ultraSonic();
 
 /// Tests IR array by printing the readings from the sensors and the position of the line
-
 ///@param qtr Reference to the array object
 void test_array(QTRSensors& qtr);
 //void setup_array(QTRSensors& qtr);
@@ -27,6 +26,5 @@ void test_array(QTRSensors& qtr);
 ///Could be used with potentiometer
 ///@param level the speed of the motor(>512 forward, <512 reverce)
 void test_motor(int level);
-//Motor
-//
+
 #endif //AUTONOMOUSCAR_TEST_FUNCTIONS_H

@@ -12,7 +12,6 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 
-void avoidHill(Servo& myServo);
 //bool detectHill(double distance1, double distance2);
 ///Setup function for gyroscope
 ///@param mpu Reference to the gyroscope
@@ -54,19 +53,20 @@ int getPosition(QTRSensors& qtr, bool& detectFinish);
 ///@return TRUE if detected FALSE otherwise
 bool obstacleDetected(double distance);
 
-///Calculate current speed based on US position
-///@param distance Distance from one of the US
-double getCurrentSpeed(double distance);
-//bool obstacleDetected(int US_trig, int US_echo);
 
 ///Avoid an obstacle
 ///@param myServo  The servo responsible for turning
 ///@param Reference to the current speed
-void avoidObstacle(Servo& myServo, double currentSpeed, double distance);
+void avoidObstacle(Servo& myServo, double currentSpeed);
 
 ///Detect a hill
 ///@param mpu Reference to the gyroscope
 int detectHill(Adafruit_MPU6050& mpu);
+
+///Avoid the obstacle
+///@param qtr Reference to the IR-Array
+///@param myServo Reference to the servo
+void avoidHill(QTRSensors& qtr, Servo& myServo);
 
 ///Stop the car
 ///@param myServo Reference to the servo responsible for turning

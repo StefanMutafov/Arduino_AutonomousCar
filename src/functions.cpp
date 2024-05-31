@@ -1,13 +1,4 @@
-//
-// Created by Stefan on 19/05/2024.
-//
-
 #include "functions.h"
-void avoidHill(Servo& myServo){
-    drive(myServo, DEFAULT_SPEED*HILL_ACCELERATION, 0);
-    delay(2500);
-
-}
 
 void setup_array(QTRSensors& qtr){
     qtr.setTypeRC();
@@ -55,36 +46,20 @@ void setupArray_manual(QTRSensors& qtr){
     for (uint8_t i = 0; i < SENSOR_COUNT; i++)
     {
         qtr.calibrationOn.maximum[i] = 2500;
-        //Serial.print(qtr.calibrationOn.maximum[i]);
-        //Serial.print(' ');
+
     }
-//    Serial.println();
-//
-//    for (uint8_t i = 0; i < SENSOR_COUNT; i++)
-//    {
-//        Serial.print(qtr.calibrationOn.minimum[i]);
-//        Serial.print(' ');
-//    }
-//    Serial.println();
 
 }
 void setupMPU(Adafruit_MPU6050& mpu){
     mpu.begin();
-    mpu.setGyroRange(MPU6050_RANGE_1000_DEG);
+    mpu.setGyroRange(MPU6050_RANGE_500_DEG);
     mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
 }
 void drive(Servo& myServo,int speed, int turnAngle){
     if(speed > 255) speed = 255;
     if(speed < -255) speed = -255;
-        if(!(SERVO_MID+turnAngle > SERVO_DEG_MAX ||   SERVO_MID+turnAngle < SERVO_DEG_MIN)) {
-        if (speed >= 0) {
-            analogWrite(LPWM_Output, speed);
-            analogWrite(RPWM_Output, 0);
-        } else {
-            analogWrite(LPWM_Output, 0);
-            analogWrite(RPWM_Output, -1 * speed);
-        }
-    }
+
+
     if(SERVO_MID+turnAngle <= SERVO_DEG_MAX && SERVO_MID+turnAngle >= SERVO_DEG_MIN){
         myServo.write(SERVO_MID+turnAngle);
     }else if(SERVO_MID+turnAngle > SERVO_DEG_MAX){
@@ -93,12 +68,20 @@ void drive(Servo& myServo,int speed, int turnAngle){
         myServo.write(SERVO_DEG_MIN);
     }
 
+    if (speed >= 0) {
+        analogWrite(LPWM_Output, speed);
+        analogWrite(RPWM_Output, 0);
+    } else {
+        analogWrite(LPWM_Output, 0);
+        analogWrite(RPWM_Output, -1 * speed);
+    }
 }
 
 double getTurnDeg(const int position) {
     const double Kp = 0.016;
    // const double Kp = 0.65;
-    const double Ki = 0.000009;
+    const double Ki = 0.000000;
+//    const double Ki = 0.000007;
     const double Kd = 0.086;
     const int midPosition = 4000;
 
@@ -113,11 +96,8 @@ double getTurnDeg(const int position) {
     derivative = error - previous_error;
     correction = Kp * error + Ki * integral + Kd * derivative;
    // double divisions = Kp*midPosition*2 + Ki*integral + Kd*(midPosition*2-previous_error);
-    //correction = map(correction, 0, Kp*midPosition* 2, 35, 90);
     //correction = ((SERVO_DEG_MAX-SERVO_DEG_MIN)/divisions)*correction;
     previous_error = error;
-   // Serial.print("Correction: ");
-    //Serial.println(correction);
     return correction;
 }
 
@@ -127,28 +107,18 @@ int getPosition(QTRSensors& qtr, bool& atFinish){
     if(array[0] == 0 && array[7] == 0){
         atFinish = true;
     }
-//    for (uint8_t i = 0; i < SENSOR_COUNT; i++)
-//    {
-//        Serial.print("Sensor ");
-//        Serial.print(i);
-//        Serial.print(":");
-//        Serial.print(array[i]);
-//        Serial.print('\t');
-//    }
-//    Serial.print("Position: ");
-//    Serial.println(position);
     return position;
 }
 
 double getUSValues(){
-    unsigned long duration1;
+    unsigned long duration;
     digitalWrite(UlTRASONIC_TRIG_PIN, LOW);
     delayMicroseconds(2);
     digitalWrite(UlTRASONIC_TRIG_PIN, HIGH);
     delayMicroseconds(10);
     digitalWrite(UlTRASONIC_TRIG_PIN, LOW);
-    duration1 = pulseIn(ULTRASONIC_ECHO_PIN, HIGH);
-    return duration1 * 0.034 / 2;
+    duration = pulseIn(ULTRASONIC_ECHO_PIN, HIGH);
+    return duration * 0.034 / 2;
 }
 
 bool obstacleDetected(double distance){
@@ -159,41 +129,18 @@ bool obstacleDetected(double distance){
     return false;
 }
 
-//bool obstacleDetected(int US_trig, int US_echo){
-//    //Could be done with NewPing library, but will probably get faulty 0 values
-//    unsigned long duration;
-//    unsigned int distance;
-//    digitalWrite(US_trig, LOW);
-//    delayMicroseconds(2);
-//    digitalWrite(US_trig, HIGH);
-//    delayMicroseconds(10);
-//    digitalWrite(US_trig, LOW);
-//    duration = pulseIn(US_echo, HIGH);
-//    //distance is measured from the board
-//    distance = duration * 0.034 / 2;
-//
-//    if (distance <= MAX_DETECT_DISTANCE)
-//    {
-//        // Serial.print("TRUE Distance of US 1 in cm: ");
-//        // Serial.println(distance);
-//        return true;
-//    }
-//
-//    // Serial.print("FALSE");
-//    return false;
-//    //Serial.print("Distance of US 1 in cm: ");
-//    //Serial.println(distance);
-//}
-void avoidObstacle(Servo& myServo, double currentSpeed, double distance){
-    double hypLength = sin(27)* distance;
-    unsigned long time = hypLength /currentSpeed;
-    drive(myServo, DEFAULT_SPEED, SERVO_DEG_MAX);
-    delay(time*1000);
 
-//    drive(myServo, DEFAULT_SPEED, SERVO_DEG_MAX);
-//    delay(1000);
-//    drive(myServo, speed, SERVO_DEG_MAX);
-//    delay(3000);
+void avoidObstacle(Servo& myServo, double currentSpeed){
+    drive(myServo, -DEFAULT_SPEED, 0);
+    delay(currentSpeed * 800);
+    drive(myServo, DEFAULT_SPEED, SERVO_DEG_MIN - SERVO_MID);
+    delay(currentSpeed * 800);
+    drive(myServo, DEFAULT_SPEED, SERVO_DEG_MAX);
+    delay(currentSpeed * 900);
+    drive(myServo, -DEFAULT_SPEED, SERVO_DEG_MIN - SERVO_MID);
+    delay(currentSpeed * 1100);
+    drive(myServo, DEFAULT_SPEED, SERVO_DEG_MAX);
+    delay(currentSpeed * 300);
 }
 
 
@@ -202,42 +149,37 @@ int detectHill(Adafruit_MPU6050& mpu){
     sensors_event_t a, g, temp;
     mpu.getEvent(&a, &g, &temp);
 
-
     if(g.gyro.y > 2){
         return -1;
-    }else if (g.gyro.y < -1){
+    }else if (g.gyro.y < -0.29){
         return 1;
     }
     return 0;
-    //this starts detecting the up properly but detects the down too quickly (we can solve it by delaying the change of speed from the time it detects the down or up)
-//    if(abs(g.gyro.y) > 0.7)
-//    {
-//        if (g.gyro.y > 0) return 1;
-//        else return -1;
-//    }
-//
-//    //delay(500);
-//
-//    return 0;
 }
-double getCurrentSpeed(double currentDistance){
-    static unsigned long current_time = 0;
-    static double lastDistance = 0;
-    if (currentDistance <= 80 && currentDistance > 60)
-    {
-        lastDistance = currentDistance;
-        current_time = millis();
-        return 0;
-    }
-    if (currentDistance <= 60 && currentDistance > 0)
-    {
-        lastDistance = lastDistance - currentDistance;
-        current_time = millis() - current_time;
-    }
-    //sm/s
-    if (current_time > 0) return lastDistance/(current_time/1000);
 
-    return 0;
+void avoidHill(QTRSensors& qtr, Servo& myServo){
+    bool finishDetected = false;
+    int position = getPosition(qtr, finishDetected );
+    double correction = getTurnDeg(position);
+    unsigned long time = millis();
+    while(millis() < time + 350){
+        position = getPosition(qtr, finishDetected);
+        correction = getTurnDeg(position);
+        drive(myServo, DEFAULT_SPEED*HILL_ACCELERATION, correction);
+
+    }
+    time = millis();
+    while(millis() < time + 750){
+        drive(myServo, DEFAULT_SPEED*HILL_ACCELERATION, 0);
+    }
+    drive(myServo, DEFAULT_SPEED/5, 0);
+    delay(500);
+    time = millis();
+    while(millis() < time + 750){
+        position = getPosition(qtr, finishDetected);
+        correction = getTurnDeg(position);
+        drive(myServo, DEFAULT_SPEED/5, correction);
+    }
 
 
 }
