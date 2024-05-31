@@ -92,8 +92,6 @@ double getTurnDeg(const int position) {
     integral += error;
     derivative = error - previous_error;
     correction = Kp * error + Ki * integral + Kd * derivative;
-    // double divisions = Kp*midPosition*2 + Ki*integral + Kd*(midPosition*2-previous_error);
-    //correction = ((SERVO_DEG_MAX-SERVO_DEG_MIN)/divisions)*correction;
     previous_error = error;
     return correction;
 }
@@ -169,17 +167,6 @@ double getInclination(Adafruit_MPU6050 &mpu) {
     return 0;
 }
 
-int detectHill(Adafruit_MPU6050 &mpu) {
-    sensors_event_t a, g, temp;
-    mpu.getEvent(&a, &g, &temp);
-
-    if (g.gyro.y > 2) {
-        return -1;
-    } else if (g.gyro.y < -0.3) {
-        return 1;
-    }
-    return 0;
-}
 
 void avoidHill(QTRSensors &qtr, Servo &myServo, Adafruit_MPU6050 &mpu,  double& inclination) {
     bool finishDetected = false;
@@ -213,24 +200,7 @@ void avoidHill(QTRSensors &qtr, Servo &myServo, Adafruit_MPU6050 &mpu,  double& 
         inclination += getInclination(mpu);
       //  Serial.println(inclination);
     }
-//    while (millis() < time + 350) {
-//        position = getPosition(qtr, finishDetected);
-//        correction = getTurnDeg(position);
-//        drive(myServo, DEFAULT_SPEED * HILL_ACCELERATION, correction);
-//
-//    }
-//    time = millis();
-//    while (millis() < time + 750) {
-//        drive(myServo, DEFAULT_SPEED * HILL_ACCELERATION, 0);
-//    }
-//    drive(myServo, DEFAULT_SPEED / 5, 0);
-//    delay(500);
-//    time = millis();
-//    while (millis() < time + 750) {
-//        position = getPosition(qtr, finishDetected);
-//        correction = getTurnDeg(position);
-//        drive(myServo, DEFAULT_SPEED / 5, correction);
-//    }
+
 
 
 }

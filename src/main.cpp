@@ -31,7 +31,6 @@ void loop() {
     static bool finishDetected = false;
     static int speed = DEFAULT_SPEED;
     int position = getPosition(qtr, finishDetected);
-    //int incline = detectHill(mpu);
     double distance = getUSValues();
     double currentSpeed = DEFAULT_SPEED / 23.63;
     inclination += getInclination(mpu);
@@ -51,17 +50,11 @@ void loop() {
         inclination += getInclination(mpu);
     }
 
-//        while (inclination > 15) {
-//            drive(myServo, DEFAULT_SPEED/2, 0);
-//            inclination += getInclination(mpu);
-//            Serial.println(inclination);
-//
-//          }
-//    if (obstacleDetected(distance)) {
-//        avoidObstacle(myServo, currentSpeed);
-//        position = getPosition(qtr, finishDetected);
-//        correction = getTurnDeg(position);
-//    }
+    if (obstacleDetected(distance)) {
+        avoidObstacle(myServo, currentSpeed);
+        position = getPosition(qtr, finishDetected);
+        correction = getTurnDeg(position);
+    }
 
     drive(myServo, speed, correction);
 

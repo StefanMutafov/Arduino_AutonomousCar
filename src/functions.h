@@ -59,10 +59,8 @@ bool obstacleDetected(double distance);
 ///@param Reference to the current speed
 void avoidObstacle(Servo& myServo, double currentSpeed,  Adafruit_MPU6050& mpu, double& inclination);
 
-///Detect a hill
-///@param mpu Reference to the gyroscope
-int detectHill(Adafruit_MPU6050& mpu);
-
+///Get the change in inclination
+///@param mpu Reference to gyro
 double getInclination(Adafruit_MPU6050& mpu);
 
 ///Avoid the obstacle
