@@ -27,31 +27,41 @@ void setup() {
 
 void loop() {
 // write your code here
+    static double inclination = 0;
     static bool finishDetected = false;
     static int speed = DEFAULT_SPEED;
     int position = getPosition(qtr, finishDetected);
-    int incline = detectHill(mpu);
+    //int incline = detectHill(mpu);
     double distance = getUSValues();
-    double currentSpeed = 1.1;
-
-
+    double currentSpeed = DEFAULT_SPEED / 23.63;
+    inclination += getInclination(mpu);
+    Serial.println(inclination);
 
     if (finishDetected) {
         stopCar(myServo);
         while (true) {
             delay(200000);
         }
-        //TODO:Make some kind of a restart mechanism, like a button or smth;
     }
     double correction = getTurnDeg(position);
-    if (obstacleDetected(distance)) {
-        avoidObstacle(myServo, currentSpeed);
+    if(inclination > 11) {
+        avoidHill(qtr, myServo, mpu, inclination);
         position = getPosition(qtr, finishDetected);
         correction = getTurnDeg(position);
+        inclination += getInclination(mpu);
     }
-    if(incline == 1) {
-        avoidHill(qtr, myServo);
-    }
+
+//        while (inclination > 15) {
+//            drive(myServo, DEFAULT_SPEED/2, 0);
+//            inclination += getInclination(mpu);
+//            Serial.println(inclination);
+//
+//          }
+//    if (obstacleDetected(distance)) {
+//        avoidObstacle(myServo, currentSpeed);
+//        position = getPosition(qtr, finishDetected);
+//        correction = getTurnDeg(position);
+//    }
 
     drive(myServo, speed, correction);
 

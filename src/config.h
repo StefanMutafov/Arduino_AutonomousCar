@@ -5,10 +5,10 @@
 #define AUTONOMOUSCAR_CONFIG_H
 #define SERVO_DEG_MAX  65 //91
 #define SERVO_DEG_MIN  10 //35
-#define SERVO_MID  38//38
+#define SERVO_MID  39//38
 #define MAX_DETECT_DISTANCE 10
-#define HILL_ACCELERATION 9.5
-#define DEFAULT_SPEED 26
+#define HILL_ACCELERATION 10//95
+#define DEFAULT_SPEED 28
 #define SENSOR_COUNT  8
 const uint8_t sensorPins[SENSOR_COUNT]{12,11,10,9,8,7,4,2};//Digital
 #define RPWM_Output 5 // Arduino PWM output pin

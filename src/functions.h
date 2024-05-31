@@ -57,16 +57,18 @@ bool obstacleDetected(double distance);
 ///Avoid an obstacle
 ///@param myServo  The servo responsible for turning
 ///@param Reference to the current speed
-void avoidObstacle(Servo& myServo, double currentSpeed);
+void avoidObstacle(Servo& myServo, double currentSpeed,  Adafruit_MPU6050& mpu, double& inclination);
 
 ///Detect a hill
 ///@param mpu Reference to the gyroscope
 int detectHill(Adafruit_MPU6050& mpu);
 
+double getInclination(Adafruit_MPU6050& mpu);
+
 ///Avoid the obstacle
 ///@param qtr Reference to the IR-Array
 ///@param myServo Reference to the servo
-void avoidHill(QTRSensors& qtr, Servo& myServo);
+void avoidHill(QTRSensors& qtr, Servo& myServo, Adafruit_MPU6050& mpu, double& inclination);
 
 ///Stop the car
 ///@param myServo Reference to the servo responsible for turning
